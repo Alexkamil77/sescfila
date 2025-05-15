@@ -215,51 +215,31 @@
         setInterval(updateDateTime, 1000);
         updateDateTime();
 
-       function displayCalledPatient(patientInfo, callingProfessionalInfo) {
+        function displayCalledPatient(patientInfo, callingProfessionalInfo) {
     lastCalledPatientInfo = patientInfo;
 
+    let title = ""; // Título padrão
+    let title = "Responsavel"; // Título padrão
     let pronoun = "à"; // Pronome padrão
     let roomText = "sala"; // Texto padrão para sala
 
     if (callingProfessionalInfo) {
         if (callingProfessionalInfo.role === 'Enfermeira') {
+            title = 'Enfermeira(o)';
             pronoun = 'à';
             roomText = 'sala';
         } else if (callingProfessionalInfo.role === 'Doutor') {
+            title = 'Doutor';
             pronoun = 'ao';
             roomText = 'consultório';
         } else if (callingProfessionalInfo.role === 'outros') {
-            // Caso "outros", omite o título e usa o texto personalizado
+            // Caso "outros", título não será usado
+            title = '';
             pronoun = 'à';
             roomText = callingProfessionalInfo.room || 'outros'; // Exemplo: "vacina" ou "triagem"
         }
     }
 
-    // Atualiza o HTML exibido
-    patientCalledSection.innerHTML = `
-        <p class="text-4xl md:text-5xl font-bold ${patientInfo.priority === 'high' ? 'patient-called-high-priority' : 'text-green-600'}">
-            ${patientInfo.name}
-        </p>
-        ${patientInfo.priority === 'high' ? '<p class="text-2xl text-red-500 font-semibold mt-1">ATENDIMENTO PRIORITÁRIO</p>' : ''}
-        <p class="text-xl md:text-2xl text-gray-700 mt-2">Por favor, dirija-se ${pronoun} ${roomText}:</p>
-    `;
-
-    // Lógica para o anúncio (fala)
-    const announcement = `${patientInfo.name}, ${patientInfo.priority === 'high' ? 'atendimento prioritário,' : ''} por favor, dirija-se ${pronoun} ${roomText}`;
-    speak(announcement);
-
-    // Configuração para repetir o anúncio a cada 30 segundos
-    if (callIntervalId) clearInterval(callIntervalId);
-    callIntervalId = setInterval(() => {
-        if (lastCalledPatientInfo) {
-            const repeatAnnouncement = `${lastCalledPatientInfo.name}, ${lastCalledPatientInfo.priority === 'high' ? 'atendimento prioritário,' : ''} por favor, dirija-se ${pronoun} ${roomText}`;
-            speak(repeatAnnouncement);
-        } else {
-            clearInterval(callIntervalId);
-            callIntervalId = null;
-        }
-    }, 30000);
-}
     patientCalledSection.innerHTML = `
         <p class="text-4xl md:text-5xl font-bold ${patientInfo.priority === 'high' ? 'patient-called-high-priority' : 'text-green-600'}">
             ${patientInfo.name}
@@ -270,7 +250,7 @@
     `;
 
     const announcement = `${patientInfo.name}, ${patientInfo.priority === 'high' ? 'atendimento prioritário,' : ''} por favor, dirija-se ${pronoun} ${roomText} ${callingProfessionalInfo && title ? `do ${title} ${callingProfessionalInfo.name}` : ''}`;
-    
+
     speak(announcement);
 
     if (callIntervalId) clearInterval(callIntervalId);
